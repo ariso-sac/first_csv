@@ -4,9 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var uploadRouter = require('./routes/upload');
 
 var app = express();
 
@@ -20,7 +20,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//mongo config
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
+//added
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+
 const db = require("./config");
 db.mongoose
   .connect(db.url, {
@@ -35,9 +42,11 @@ db.mongoose
     process.exit();
   });
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/upload', uploadRouter);
+var apiRouter = require('./routes/apiroutes');
+app.use('/api',apiRouter);
+var upRouter = require('./routes/upload');
+app.use('/upload',upRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
